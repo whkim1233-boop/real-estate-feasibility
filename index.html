@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>부동산 개발 사업성 및 Cash Flow 시뮬레이터 (Full Scale)</title>
+    <!-- Noto Sans KR & Inter Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- Lucide Icons Local -->
+    <script src="lib/lucide.min.js"></script>
+    <!-- Chart.js Local -->
+    <script src="lib/chart.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- 사이드바 / 입력 패널 (인쇄 시 자동 숨김) -->
+        <aside class="sidebar-panel">
+            <div class="sidebar-header">
+                <i data-lucide="building-2" class="brand-icon"></i>
+                <div>
+                    <h1>인사동 PFV</h1>
+                    <p class="subtitle">부동산 개발 사업성 & CF 분석기</p>
+                </div>
+            </div>
+
+            <!-- 입력 탭 메뉴 -->
+            <div class="tabs-nav">
+                <button class="tab-btn active" data-tab="tab-overview">
+                    <i data-lucide="info"></i>개요/매출
+                </button>
+                <button class="tab-btn" data-tab="tab-cost-direct">
+                    <i data-lucide="wallet"></i>토지/공사
+                </button>
+                <button class="tab-btn" data-tab="tab-cost-indirect">
+                    <i data-lucide="layers"></i>간접/분양/용역
+                </button>
+                <button class="tab-btn" data-tab="tab-finance">
+                    <i data-lucide="coins"></i>금융/PF
+                </button>
+            </div>
+
+            <!-- 입력 탭 콘텐츠 -->
+            <div class="tabs-content">
+                <!-- 탭 1: 개요 및 사업 일정 / 상품별 분양 매출 -->
+                <div class="tab-pane active" id="tab-overview">
+                    <div class="section-title">사업 기본 정보</div>
+                    <div class="input-group">
+                        <label for="projectName">사업명</label>
+                        <input type="text" id="projectName" value="인사동 오피스/리테일 복합개발사업">
+                    </div>
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label for="duration">총 사업 기간 (개월)</label>
+                            <input type="number" id="duration" value="36" min="12" max="120">
+                        </div>
+                        <div class="input-group">
+                            <label for="pfTiming">PF 실행 시점 (월차)</label>
+                            <input type="number" id="pfTiming" value="10" min="1" max="60">
+                        </div>
+                    </div>
+
+                    <div class="section-title">건축 설계 개요</div>
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label for="landAreaPy">토지 면적 (평)</label>
+                            <input type="number" id="landAreaPy" value="493.8" step="0.1">
+                        </div>
+                        <div class="input-group">
+                            <label for="landAreaM2">토지 면적 (㎡)</label>
+                            <input type="number" id="landAreaM2" value="1632.4" step="0.1" readonly>
+                        </div>
+                    </div>
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label for="gfaPy">총 분양면적 합계 (평)</label>
+                            <input type="number" id="gfaPy" value="4970.8" step="0.1" readonly style="font-weight: 700; color: var(--color-sky);">
+                        </div>
+                        <div class="input-group">
+                            <label for="gfaM2">총 분양면적 합계 (㎡)</label>
+                            <input type="number" id="gfaM2" value="16432.4" step="0.1" readonly>
+                        </div>
+                    </div>
+
+                    <div class="section-title">상품 용도별 분양 매출 스펙</div>
+                    
+                    <!-- 공동주택 -->
+                    <div class="product-input-card" style="margin-bottom: 10px; padding: 10px; background: rgba(255,255,255,0.02); border-radius: 6px; border: 1px solid rgba(255,255,255,0.05);">
+                        <div style="font-size: 0.75rem; font-weight: 700; color: #10b981; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
+                            <span class="color-dot in" style="background-color: #10b981;"></span>
+                            <input type="text" id="name_apt" value="공동주택" class="product-name-input" title="상품 이름 수정 가능">
+                        </div>
+                        <div class="input-row">
+                            <div class="input-group">
+                                <label>분양면적 (평)</label>
+                                <input type="number" id="salesArea_apt" value="1500" step="10">
+                            </div>
+                            <div class="input-group">
+                                <label>평당 분양가 (만원)</label>
+                                <input type="number" id="price_apt" value="3200" step="10">
+                            </div>
+                        </div>
+                        <div class="input-row" style="margin-top: 6px;">
+                            <div class="input-group">
+                                <label>분양시작 (월차)</label>
+                                <input type="number" id="start_apt" value="15" min="1">
+                            </div>
+                            <div class="input-group">
+                                <label>목표 분양률 (%)</label>
+                                <input type="number" id="rate_apt" value="100" min="0" max="100">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 업무시설 -->
+                    <div class="product-input-card" style="margin-bottom: 10px; padding: 10px; background: rgba(255,255,255,0.02); border-radius: 6px; border: 1px solid rgba(255,255,255,0.05);">
+                        <div style="font-size: 0.75rem; font-weight: 700; color: #3b82f6; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
+                            <span class="color-dot in" style="background-color: #3b82f6;"></span>
+                            <input type="text" id="name_off" value="업무시설" class="product-name-input" title="상품 이름 수정 가능">
+                        </div>
+                        <div class="input-row">
+                            <div class="input-group">
+                                <label>분양면적 (평)</label>
+                                <input type="number" id="salesArea_off" value="2470.8" step="10">
+                            </div>
+                            <div class="input-group">
+                                <label>평당 분양가 (만원)</label>
+                                <input type="number" id="price_off" value="2800" step="10">
+                            </div>
+                        </div>
+                        <div class="input-row" style="margin-top: 6px;">
+                            <div class="input-group">
+                                <label>분양시작 (월차)</label>
+                                <input type="number" id="start_off" value="15" min="1">
+                            </div>
+                            <div class="input-group">
+                                <label>목표 분양률 (%)</label>
+                                <input type="number" id="rate_off" value="100" min="0" max="100">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 근린생활시설 -->
+                    <div class="product-input-card" style="margin-bottom: 10px; padding: 10px; background: rgba(255,255,255,0.02); border-radius: 6px; border: 1px solid rgba(255,255,255,0.05);">
+                        <div style="font-size: 0.75rem; font-weight: 700; color: #f59e0b; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
+                            <span class="color-dot in" style="background-color: #f59e0b;"></span>
+                            <input type="text" id="name_rtl" value="근린생활시설" class="product-name-input" title="상품 이름 수정 가능">
+                        </div>
+                        <div class="input-row">
+                            <div class="input-group">
+                                <label>분양면적 (평)</label>
+                                <input type="number" id="salesArea_rtl" value="700" step="10">
+                            </div>
+                            <div class="input-group">
+                                <label>평당 분양가 (만원)</label>
+                                <input type="number" id="price_rtl" value="4500" step="10">
+                            </div>
+                        </div>
+                        <div class="input-row" style="margin-top: 6px;">
+                            <div class="input-group">
+                                <label>분양시작 (월차)</label>
+                                <input type="number" id="start_rtl" value="20" min="1">
+                            </div>
+                            <div class="input-group">
+                                <label>목표 분양률 (%)</label>
+                                <input type="number" id="rate_rtl" value="90" min="0" max="100">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 문화시설 -->
+                    <div class="product-input-card" style="margin-bottom: 10px; padding: 10px; background: rgba(255,255,255,0.02); border-radius: 6px; border: 1px solid rgba(255,255,255,0.05);">
+                        <div style="font-size: 0.75rem; font-weight: 700; color: #a855f7; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
+                            <span class="color-dot in" style="background-color: #a855f7;"></span>
+                            <input type="text" id="name_clt" value="문화시설" class="product-name-input" title="상품 이름 수정 가능">
+                        </div>
+                        <div class="input-row">
+                            <div class="input-group">
+                                <label>분양면적 (평)</label>
+                                <input type="number" id="salesArea_clt" value="300" step="10">
+                            </div>
+                            <div class="input-group">
+                                <label>평당 분양가 (만원)</label>
+                                <input type="number" id="price_clt" value="2200" step="10">
+                            </div>
+                        </div>
+                        <div class="input-row" style="margin-top: 6px;">
+                            <div class="input-group">
+                                <label>분양시작 (월차)</label>
+                                <input type="number" id="start_clt" value="24" min="1">
+                            </div>
+                            <div class="input-group">
+                                <label>목표 분양률 (%)</label>
+                                <input type="number" id="rate_clt" value="100" min="0" max="100">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 탭 2: 토지비 및 직접공사비 -->
+                <div class="tab-pane" id="tab-cost-direct">
+                    <div class="section-title">1. 토지비 및 취득 부대비용 (Land & Acquisition Costs)</div>
+                    <div class="input-group">
+                        <label for="landPricePy">평당 토지 매입가 (Purchase Price per Py)</label>
+                        <input type="number" id="landPricePy" value="8761" step="10">
+                    </div>
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label for="landPriceTotal">토지비 원금 (Land Purchase Principal, 억원)</label>
+                            <input type="number" id="landPriceTotal" value="432.6" step="0.1" readonly>
+                        </div>
+                        <div class="input-group">
+                            <label for="landEviction">명도비용 (Land Eviction & Compensation, 억원)</label>
+                            <input type="number" id="landEviction" value="8.9" step="0.1">
+                        </div>
+                    </div>
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label for="landCommission">토지매입수수료/실사비 (Transaction Brokerage Fee, 억원)</label>
+                            <input type="number" id="landCommission" value="2.5" step="0.1">
+                        </div>
+                        <div class="input-group">
+                            <label for="landAcquisitionTax">취득세 및 공과금 (Acquisition Tax & Charges, %)</label>
+                            <input type="number" id="landAcquisitionTax" value="5.2" step="0.1">
+                        </div>
+                    </div>
+
+                    <div class="section-title">2. 직접공사비 (Direct Construction Costs)</div>
+                    <div class="input-group">
+                        <label for="constructionCostPy">평당 도급공사비 (Construction Cost per GFA Py, 만원)</label>
+                        <input type="number" id="constructionCostPy" value="600" step="10">
+                    </div>
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label for="demolitionCost">철거 및 지장물공사비 (Demolition & Site Clearance, 억원)</label>
+                            <input type="number" id="demolitionCost" value="5.0" step="0.1">
+                        </div>
+                        <div class="input-group">
+                            <label for="constructionContingency">공사 예비비 (Construction Contingency, 억원)</label>
+                            <input type="number" id="constructionContingency" value="7.5" step="0.1">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 탭 3: 간접공사비, 분양관련비, 용역비 및 제세공과 -->
+                <div class="tab-pane" id="tab-cost-indirect">
+                    <div class="section-title">3. 간접공사비 항목</div>
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label for="designCostPy">평당 건축설계비 (만원)</label>
+                            <input type="number" id="designCostPy" value="30" step="1">
+                        </div>
+                        <div class="input-group">
+                            <label for="supervisionCostPy">평당 감리비 (만원)</label>
+                            <input type="number" id="supervisionCostPy" value="15" step="1">
+                        </div>
+                    </div>
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label for="inflowCostPy">평당 인입공사비 (만원)</label>
+                            <input type="number" id="inflowCostPy" value="7" step="1">
+                        </div>
+                        <div class="input-group">
+                            <label for="surveyCost">측량 및 지질조사 (억원)</label>
+                            <input type="number" id="surveyCost" value="3.0" step="0.1">
+                        </div>
+                    </div>
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label for="permissionCost">인허가비용 (억원)</label>
+                            <input type="number" id="permissionCost" value="1.5" step="0.1">
+                        </div>
+                        <div class="input-group">
+                            <label for="artInstallation">미술장식품설치 (억원)</label>
+                            <input type="number" id="artInstallation" value="1.5" step="0.1">
+                        </div>
+                    </div>
+
+                    <div class="section-title">4. 분양관련비 항목</div>
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label for="mhRent">M/H부지임차료 (억원)</label>
+                            <input type="number" id="mhRent" value="2.0" step="0.1">
+                        </div>
+                        <div class="input-group">
+                            <label for="mhBuild">M/H건립비 (억원)</label>
+                            <input type="number" id="mhBuild" value="10.0" step="0.1">
+                        </div>
+                    </div>
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label for="mhOperation">M/H운영비 (억원)</label>
+                            <input type="number" id="mhOperation" value="5.0" step="0.1">
+                        </div>
+                        <div class="input-group">
+                            <label for="guaranteeFee">분양보증수수료 (억원)</label>
+                            <input type="number" id="guaranteeFee" value="3.5" step="0.1">
+                        </div>
+                    </div>
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label for="loanGuaranteeFee">중도금대출보증 (억원)</label>
+                            <input type="number" id="loanGuaranteeFee" value="2.5" step="0.1">
+                        </div>
+                        <div class="input-group">
+                            <label for="adCost">광고홍보비 (억원)</label>
+                            <input type="number" id="adCost" value="18.5" step="0.1">
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label for="leaseAgencyFee">임대대행(상가) 수수료 (억원)</label>
+                        <input type="number" id="leaseAgencyFee" value="9.7" step="0.1">
+                    </div>
+
+                    <div class="section-title">5. 용역비 / 관리비 항목</div>
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label for="trustFee">신탁수수료 (억원)</label>
+                            <input type="number" id="trustFee" value="2.0" step="0.1">
+                        </div>
+                        <div class="input-group">
+                            <label for="generalAgencyFee">제용역비 (억원)</label>
+                            <input type="number" id="generalAgencyFee" value="5.2" step="0.1">
+                        </div>
+                    </div>
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label for="appraisalFee">감정평가수수료 (억원)</label>
+                            <input type="number" id="appraisalFee" value="5.0" step="0.1">
+                        </div>
+                        <div class="input-group">
+                            <label for="lenderLegalFee">대주/시공사 법률자문 (억원)</label>
+                            <input type="number" id="lenderLegalFee" value="2.0" step="0.1">
+                        </div>
+                    </div>
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label for="devLegalFee">법률자문보수 (억원)</label>
+                            <input type="number" id="devLegalFee" value="4.4" step="0.1">
+                        </div>
+                        <div class="input-group">
+                            <label for="pmPrePf">PM수수료(PF전 월/만)</label>
+                            <input type="number" id="pmPrePf" value="2000" step="100">
+                        </div>
+                    </div>
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label for="pmPostPf">PM수수료(PF후 월/만)</label>
+                            <input type="number" id="pmPostPf" value="5000" step="100">
+                        </div>
+                        <div class="input-group">
+                            <label for="siteManagement">현장관리비 (억원)</label>
+                            <input type="number" id="siteManagement" value="3.0" step="0.1">
+                        </div>
+                    </div>
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label for="cashManageFee">자금관리수수료 (억원)</label>
+                            <input type="number" id="cashManageFee" value="1.2" step="0.1">
+                        </div>
+                        <div class="input-group">
+                            <label for="assetManageFee">자산관리수수료 (억원)</label>
+                            <input type="number" id="assetManageFee" value="3.1" step="0.1">
+                        </div>
+                    </div>
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label for="auditPreFee">내부감사보수 (억원)</label>
+                            <input type="number" id="auditPreFee" value="0.3" step="0.1">
+                        </div>
+                        <div class="input-group">
+                            <label for="insuranceFee">보험비 (억원)</label>
+                            <input type="number" id="insuranceFee" value="0.5" step="0.1">
+                        </div>
+                    </div>
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label for="bookkeepFee">기장대리수수료 (억원)</label>
+                            <input type="number" id="bookkeepFee" value="0.6" step="0.1">
+                        </div>
+                        <div class="input-group">
+                            <label for="auditPostFee">외부감사수수료 (억원)</label>
+                            <input type="number" id="auditPostFee" value="0.5" step="0.1">
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label for="indirectContingency">예비비 (억원)</label>
+                        <input type="number" id="indirectContingency" value="37.1" step="0.1">
+                    </div>
+
+                    <div class="section-title">6. 제세공과 항목</div>
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label for="regTaxes">보존등기비 (억원)</label>
+                            <input type="number" id="regTaxes" value="18.9" step="0.1">
+                        </div>
+                        <div class="input-group">
+                            <label for="infraCharge">기반시설부담금 (억원)</label>
+                            <input type="number" id="infraCharge" value="40.0" step="0.1">
+                        </div>
+                    </div>
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label for="schoolCharge">학교용지부담금 (억원)</label>
+                            <input type="number" id="schoolCharge" value="0.0" step="0.1">
+                        </div>
+                        <div class="input-group">
+                            <label for="licenceTax">등록면허세 (억원)</label>
+                            <input type="number" id="licenceTax" value="0.2" step="0.1">
+                        </div>
+                    </div>
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label for="miscCharge"> 각종부담금 (억원)</label>
+                            <input type="number" id="miscCharge" value="5.0" step="0.1">
+                        </div>
+                        <div class="input-group">
+                            <label for="holdingTax">토지보유세 (억원)</label>
+                            <input type="number" id="holdingTax" value="4.0" step="0.1">
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label for="cityPlanTax">도시계획세 (억원)</label>
+                        <input type="number" id="cityPlanTax" value="1.3" step="0.1">
+                    </div>
+                </div>
+
+                <!-- 탭 4: 금융 구조 및 PF 조건 -->
+                <div class="tab-pane" id="tab-finance">
+                    <div class="section-title">초기 재원 & 브릿지론 (Bridge Loan)</div>
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label for="equity">자기자본 Equity (억원)</label>
+                            <input type="number" id="equity" value="52.6" step="0.1">
+                        </div>
+                        <div class="input-group">
+                            <label for="blAmount">브릿지론 대출금액 (억원)</label>
+                            <input type="number" id="blAmount" value="500.0" step="1">
+                        </div>
+                    </div>
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label for="blFee">B/L 취급수수료 (%)</label>
+                            <input type="number" id="blFee" value="3.0" step="0.1">
+                        </div>
+                        <div class="input-group">
+                            <label for="blInterest">B/L 대출이자율 (연 %)</label>
+                            <input type="number" id="blInterest" value="6.0" step="0.1">
+                        </div>
+                    </div>
+
+                    <div class="section-title">본 PF 대출 조건 (Tranche A & B)</div>
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label for="pfTrA">Tr.A PF 대출금 (억원)</label>
+                            <input type="number" id="pfTrA" value="1229.0" step="1">
+                        </div>
+                        <div class="input-group">
+                            <label for="pfTrB">Tr.B PF 대출금 (억원)</label>
+                            <input type="number" id="pfTrB" value="0.0" step="1">
+                        </div>
+                    </div>
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label for="pfTrAInterest">Tr.A 이자율 (연 %)</label>
+                            <input type="number" id="pfTrAInterest" value="6.0" step="0.1">
+                        </div>
+                        <div class="input-group">
+                            <label for="pfTrBInterest">Tr.B 이자율 (연 %)</label>
+                            <input type="number" id="pfTrBInterest" value="6.0" step="0.1">
+                        </div>
+                    </div>
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label for="pfTrAFee">Tr.A 취급수수료 (%)</label>
+                            <input type="number" id="pfTrAFee" value="1.0" step="0.1">
+                        </div>
+                        <div class="input-group">
+                            <label for="pfTrBFee">Tr.B 취급수수료 (%)</label>
+                            <input type="number" id="pfTrBFee" value="3.0" step="0.1">
+                        </div>
+                    </div>
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label for="pfArrangeFee">PF 주관수수료 (%)</label>
+                            <input type="number" id="pfArrangeFee" value="1.0" step="0.1">
+                        </div>
+                        <div class="input-group">
+                            <label for="fiAdvisoryFee">FI 재무자문수수료 (억원)</label>
+                            <input type="number" id="fiAdvisoryFee" value="0.0" step="0.1">
+                        </div>
+                    </div>
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label for="absCosts">담보대출유동화비용 (억원)</label>
+                            <input type="number" id="absCosts" value="0.0" step="0.1">
+                        </div>
+                        <div class="input-group">
+                            <label for="undrawnFee">미인출수수료 (%)</label>
+                            <input type="number" id="undrawnFee" value="0.0" step="0.1">
+                        </div>
+                    </div>
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label for="freeInterestHousing">중도금무이자(주거) (%)</label>
+                            <input type="number" id="freeInterestHousing" value="0.0" step="0.1">
+                        </div>
+                        <div class="input-group">
+                            <label for="freeInterestRetail">중도금무이자(상가) (%)</label>
+                            <input type="number" id="freeInterestRetail" value="0.0" step="0.1">
+                        </div>
+                    </div>
+
+                    <div class="section-title">자금 리스크 & 투자 분석</div>
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label for="capCallInterest">Capital Call 이자 (연 %)</label>
+                            <input type="number" id="capCallInterest" value="8.0" step="0.5" class="highlight-input">
+                        </div>
+                        <div class="input-group">
+                            <label for="discountRate">NPV 할인율 (연 %)</label>
+                            <input type="number" id="discountRate" value="6.0" step="0.1">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 시뮬레이션 계산 실행 버튼 -->
+            <button id="runSimBtn" class="action-btn">
+                <i data-lucide="play-circle"></i>시뮬레이션 분석 실행
+            </button>
+        </aside>
+
+        <!-- 우측 메인 대시보드 화면 -->
+        <main class="dashboard-main">
+            <!-- 탑 헤더 -->
+            <header class="main-header">
+                <h2 id="displayProjectName">인사동 오피스/리테일 개발사업 대시보드</h2>
+                <div class="header-actions">
+                    <button class="icon-btn" id="loadVitaminBtn" style="border-color: var(--color-emerald) !important; background: rgba(16, 185, 129, 0.1) !important; color: #34d399 !important; font-weight: 600;">
+                        <i data-lucide="file-spreadsheet"></i>창전동 복합(Vitamin) 로드
+                    </button>
+                    <button class="icon-btn" id="loadInsadongBtn" style="border-color: var(--color-sky) !important; background: rgba(14, 165, 233, 0.1) !important; color: #60a5fa !important; font-weight: 600;">
+                        <i data-lucide="file-text"></i>인사동 PFV 로드
+                    </button>
+                    <button class="icon-btn" onclick="window.print()">
+                        <i data-lucide="printer"></i>리포트 인쇄
+                    </button>
+                </div>
+            </header>
+
+            <!-- [인쇄 전용] 사업 주요 가정 사항 (Assumptions Summary) -->
+            <section class="print-assumptions-section card-panel" id="printAssumptions">
+                <h3>사업 타당성 분석 주요 가정 사항 (Assumptions)</h3>
+                <div class="print-assumptions-grid">
+                    <table class="report-table">
+                        <thead>
+                            <tr>
+                                <th colspan="2">1. 사업 개요 및 일정</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>총 사업 기간</td><td id="p_duration">-</td></tr>
+                            <tr><td>PF 실행 시점</td><td id="p_pfTiming">-</td></tr>
+                            <tr><td>토지 면적 (평/㎡)</td><td id="p_landArea">-</td></tr>
+                            <tr><td>총 분양면적 (평/㎡)</td><td id="p_gfa">-</td></tr>
+                        </tbody>
+                    </table>
+                    
+                    <table class="report-table">
+                        <thead>
+                            <tr>
+                                <th colspan="5">2. 분양 상품 스펙 및 매출 가정</th>
+                            </tr>
+                            <tr>
+                                <th>구분</th>
+                                <th>면적(평)</th>
+                                <th>평당분양가(만)</th>
+                                <th>시작월차</th>
+                                <th>목표분양률</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr id="tr_p_apt">
+                                <td id="p_lbl_apt">공동주택</td>
+                                <td id="p_area_apt">-</td>
+                                <td id="p_price_apt">-</td>
+                                <td id="p_start_apt">-</td>
+                                <td id="p_rate_apt">-</td>
+                            </tr>
+                            <tr id="tr_p_off">
+                                <td id="p_lbl_off">업무시설</td>
+                                <td id="p_area_off">-</td>
+                                <td id="p_price_off">-</td>
+                                <td id="p_start_off">-</td>
+                                <td id="p_rate_off">-</td>
+                            </tr>
+                            <tr id="tr_p_rtl">
+                                <td id="p_lbl_rtl">근린상가</td>
+                                <td id="p_area_rtl">-</td>
+                                <td id="p_price_rtl">-</td>
+                                <td id="p_start_rtl">-</td>
+                                <td id="p_rate_rtl">-</td>
+                            </tr>
+                            <tr id="tr_p_clt">
+                                <td id="p_lbl_clt">문화시설</td>
+                                <td id="p_area_clt">-</td>
+                                <td id="p_price_clt">-</td>
+                                <td id="p_start_clt">-</td>
+                                <td id="p_rate_clt">-</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
+                    <table class="report-table">
+                        <thead>
+                            <tr>
+                                <th colspan="2">3. 핵심 사업비 변수 (억원)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>평당 도급공사비</td><td id="p_constPy">-</td></tr>
+                            <tr><td>토지비 원금</td><td id="p_landPrice">-</td></tr>
+                            <tr><td>명도비용 / 철거비</td><td id="p_evicDemo">-</td></tr>
+                            <tr><td>PM 수수료 (Pre/Post)</td><td id="p_pmFee">-</td></tr>
+                        </tbody>
+                    </table>
+
+                    <table class="report-table">
+                        <thead>
+                            <tr>
+                                <th colspan="2">4. 금융 및 PF 조건</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>자기자본(Equity) / 브릿지론</td><td id="p_eqBl">-</td></tr>
+                            <tr><td>브릿지론 금리 / 수수료</td><td id="p_blRate">-</td></tr>
+                            <tr><td>본 PF Tr.A 한도 / 금리</td><td id="p_pfTrA">-</td></tr>
+                            <tr><td>Capital Call 금리 / 할인율</td><td id="p_capDiscount">-</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- 주요 지표 (KPI) 그리드 -->
+            <section class="kpi-grid">
+                <div class="kpi-card text-emerald">
+                    <div class="kpi-header">
+                        <span>총 분양 매출 (Gross Revenue)</span>
+                        <i data-lucide="trending-up"></i>
+                    </div>
+                    <div class="kpi-value" id="kpiGrossRevenue">0.0 <span>억원</span></div>
+                    <p class="kpi-footer" id="kpiSalesRate">가중평균 분양률 0%</p>
+                </div>
+                <div class="kpi-card text-amber">
+                    <div class="kpi-header">
+                        <span>총 투자비 (Total Cost)</span>
+                        <i data-lucide="coins"></i>
+                    </div>
+                    <div class="kpi-value" id="kpiTotalCost">0.0 <span>억원</span></div>
+                    <p class="kpi-footer">금융 비용 및 예비비 포함</p>
+                </div>
+                <div class="kpi-card text-sky">
+                    <div class="kpi-header">
+                        <span>세전 사업 이익 / ROI</span>
+                        <i data-lucide="percent"></i>
+                    </div>
+                    <div class="kpi-value" id="kpiNetProfit">0.0 <span>억원</span></div>
+                    <p class="kpi-footer" id="kpiRoi">수익률 (ROI): 0.0%</p>
+                </div>
+                <div class="kpi-card text-crimson highlight-card">
+                    <div class="kpi-header">
+                        <span>누적 Capital Call / 이자</span>
+                        <i data-lucide="alert-triangle"></i>
+                    </div>
+                    <div class="kpi-value" id="kpiCapitalCall">0.0 <span>억원</span></div>
+                    <p class="kpi-footer" id="kpiCapitalCallInterest">추가금융이자: 0.0억원</p>
+                </div>
+                
+                <!-- NPV 추가 카드 -->
+                <div class="kpi-card text-sky">
+                    <div class="kpi-header">
+                        <span>순현재가치 (Project NPV)</span>
+                        <i data-lucide="bar-chart-3"></i>
+                    </div>
+                    <div class="kpi-value" id="kpiNPV">0.0 <span>억원</span></div>
+                    <p class="kpi-footer" id="kpiDiscountRateText">할인율 연 6.0% 기준</p>
+                </div>
+
+                <!-- IRR 추가 카드 -->
+                <div class="kpi-card text-emerald">
+                    <div class="kpi-header">
+                        <span>내부수익률 (Project IRR)</span>
+                        <i data-lucide="line-chart"></i>
+                    </div>
+                    <div class="kpi-value" id="kpiIRR">0.0 <span>%</span></div>
+                    <p class="kpi-footer" id="kpiEquityIrrText">Equity IRR: 0.0%</p>
+                </div>
+            </section>
+
+            <!-- 차트 영역 -->
+            <section class="charts-section">
+                <div class="chart-container card-panel">
+                    <h3>월별 누적 현금 흐름 및 Capital Call 추이</h3>
+                    <div class="chart-wrapper">
+                        <canvas id="cashFlowChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-container card-panel mini-chart">
+                    <h3>사업비 항목 구성비</h3>
+                    <div class="chart-wrapper">
+                        <canvas id="costStructureChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 민감도 분석 및 추가 디테일 -->
+            <section class="analysis-section grid-2">
+                <!-- 민감도 매트릭스 -->
+                <div class="card-panel">
+                    <h3>분양가 vs 공사비 세전이익 민감도 분석 (5x5, 단위: 억원)</h3>
+                    <p class="card-subtitle">상단: 분양가 변동률 | 좌측: 공사비 변동률</p>
+                    <div class="matrix-wrapper">
+                        <table class="matrix-table" id="sensitivityTable">
+                            <!-- JS를 통해 동적 생성 -->
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 자금 수지 특이사항 요약 -->
+                <div class="card-panel">
+                    <h3>현금 흐름 및 자금 리스크 검토 의견</h3>
+                    <div class="insights-content" id="insightBox">
+                        <!-- JS를 통해 인사이트 생성 -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- 상세 월별 Cash Flow 테이블 -->
+            <section class="table-section card-panel">
+                <div class="table-header">
+                    <h3>월별 자금 수지(Cash Flow) 디테일</h3>
+                    <div class="table-legend">
+                        <span class="legend-item"><span class="color-dot in"></span>자금 유입</span>
+                        <span class="legend-item"><span class="color-dot out"></span>자금 유출</span>
+                        <span class="legend-item"><span class="color-dot cc"></span>Capital Call</span>
+                        <button id="toggleAllRowsBtn" class="icon-btn" style="margin-left: 10px; padding: 4px 8px; font-size: 0.75rem;">
+                            <i data-lucide="chevrons-up-down"></i>전체 펼치기/접기
+                        </button>
+                    </div>
+                </div>
+                <div class="table-wrapper">
+                    <table class="cf-table" id="cfDetailTable">
+                        <thead>
+                            <tr id="cfTableHeader">
+                                <!-- JS를 통해 동적 생성 -->
+                            </tr>
+                        </thead>
+                        <tbody id="cfTableBody">
+                            <!-- JS를 통해 동적 생성 -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

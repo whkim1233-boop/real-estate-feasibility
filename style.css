@@ -1,0 +1,885 @@
+/* CSS 변수 선언 - 프리미엄 다크 글래스모피즘 테마 */
+:root {
+    --bg-main: #0b0f19;
+    --bg-card: rgba(22, 29, 49, 0.7);
+    --bg-card-hover: rgba(22, 29, 49, 0.95);
+    --bg-input: rgba(13, 17, 28, 0.8);
+    --border-color: rgba(255, 255, 255, 0.08);
+    
+    --text-primary: #f3f4f6;
+    --text-secondary: #9ca3af;
+    --text-muted: #6b7280;
+    
+    --color-sky: #0ea5e9;
+    --color-emerald: #10b981;
+    --color-amber: #f59e0b;
+    --color-crimson: #ef4444;
+    
+    --shadow-premium: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+/* 기본 리셋 및 전역 스타일 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', 'Noto Sans KR', sans-serif;
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    line-height: 1.5;
+    overflow-x: hidden;
+}
+
+/* 스크롤바 디자인 */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.01);
+}
+::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* 레이아웃 구조 */
+.app-container {
+    display: flex;
+    min-height: 100vh;
+    width: 100vw;
+}
+
+/* 좌측 입력 사이드바 */
+.sidebar-panel {
+    width: 380px;
+    min-width: 380px;
+    background: #0f172a;
+    border-right: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    position: sticky;
+    top: 0;
+}
+
+.sidebar-header {
+    padding: 20px;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.brand-icon {
+    color: var(--color-sky);
+    width: 28px;
+    height: 28px;
+}
+
+.sidebar-header h1 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    color: #ffffff;
+}
+
+.sidebar-header .subtitle {
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+}
+
+/* 사이드바 내부 탭 메뉴 */
+.tabs-nav {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    background: rgba(0, 0, 0, 0.2);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.tab-btn {
+    padding: 10px 4px;
+    font-size: 0.72rem;
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    transition: all 0.2s ease;
+}
+
+.tab-btn i {
+    width: 16px;
+    height: 16px;
+}
+
+.tab-btn:hover {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.tab-btn.active {
+    color: var(--color-sky);
+    background: rgba(14, 165, 233, 0.1);
+    font-weight: 600;
+    border-bottom: 2px solid var(--color-sky);
+}
+
+/* 입력창 콘텐츠 영역 */
+.tabs-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+}
+
+.tab-pane {
+    display: none;
+}
+
+.tab-pane.active {
+    display: block;
+}
+
+/* 공통 입력 컨트롤 */
+.section-title {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--color-sky);
+    margin-top: 18px;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-left: 2px solid var(--color-sky);
+    padding-left: 8px;
+}
+
+.input-group {
+    margin-bottom: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.input-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+label {
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+}
+
+input[type="text"],
+input[type="number"] {
+    width: 100%;
+    background: var(--bg-input);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    padding: 8px 10px;
+    color: #ffffff;
+    font-size: 0.8rem;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus {
+    border-color: var(--color-sky);
+    box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.25);
+}
+
+input[readonly] {
+    background: rgba(255, 255, 255, 0.02);
+    color: var(--text-secondary);
+    cursor: not-allowed;
+}
+
+/* 강조 입력필드 */
+.highlight-input {
+    border-color: rgba(239, 68, 68, 0.4) !important;
+}
+
+/* 실행 버튼 */
+.action-btn {
+    width: calc(100% - 32px);
+    margin: 16px;
+    background: linear-gradient(135deg, var(--color-sky) 0%, #0284c7 100%);
+    border: none;
+    border-radius: 6px;
+    color: #ffffff;
+    padding: 12px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
+    transition: all 0.2s ease;
+}
+
+.action-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(14, 165, 233, 0.4);
+}
+
+/* 메인 대시보드 패널 */
+.dashboard-main {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px;
+    background-image: radial-gradient(at 0% 0%, rgba(14, 165, 233, 0.05) 0, transparent 50%);
+}
+
+.main-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 16px;
+}
+
+.main-header h2 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.header-actions {
+    display: flex;
+    gap: 12px;
+}
+
+.icon-btn {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    border-radius: 4px;
+    padding: 6px 12px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+}
+
+.icon-btn:hover {
+    background: var(--bg-card-hover);
+    border-color: var(--color-sky);
+}
+
+/* KPI 그리드 */
+.kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+}
+
+.kpi-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 16px;
+    backdrop-filter: blur(10px);
+    box-shadow: var(--shadow-premium);
+}
+
+.kpi-header {
+    display: flex;
+    justify-content: space-between;
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+    font-weight: 500;
+    margin-bottom: 8px;
+}
+
+.kpi-header i {
+    width: 16px;
+    height: 16px;
+}
+
+.kpi-value {
+    font-size: 1.6rem;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    margin-bottom: 4px;
+}
+
+.kpi-value span {
+    font-size: 0.85rem;
+    font-weight: 400;
+    color: var(--text-secondary);
+}
+
+.kpi-footer {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+}
+
+/* KPI 개별 테마 컬러 */
+.text-emerald .kpi-value { color: var(--color-emerald); }
+.text-emerald i { color: var(--color-emerald); }
+.text-amber .kpi-value { color: var(--color-amber); }
+.text-amber i { color: var(--color-amber); }
+.text-sky .kpi-value { color: var(--color-sky); }
+.text-sky i { color: var(--color-sky); }
+.text-crimson .kpi-value { color: var(--color-crimson); }
+.text-crimson i { color: var(--color-crimson); }
+
+/* 리스크 강조 카드 스타일 */
+.highlight-card {
+    background: rgba(239, 68, 68, 0.08) !important;
+    border-color: rgba(239, 68, 68, 0.2) !important;
+}
+
+/* 차트 구역 */
+.charts-section {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 16px;
+    margin-top: 16px;
+}
+
+.card-panel {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 20px;
+    backdrop-filter: blur(10px);
+    box-shadow: var(--shadow-premium);
+}
+
+.card-panel h3 {
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: #ffffff;
+}
+
+.card-subtitle {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    margin-top: -8px;
+    margin-bottom: 12px;
+}
+
+.chart-wrapper {
+    position: relative;
+    height: 260px;
+    width: 100%;
+}
+
+/* 분석 그리드 구역 */
+.analysis-section {
+    margin-top: 16px;
+}
+
+.grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+/* 민감도 테이블 */
+.matrix-wrapper {
+    overflow-x: auto;
+}
+
+.matrix-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.75rem;
+    text-align: center;
+}
+
+.matrix-table th, 
+.matrix-table td {
+    padding: 8px;
+    border: 1px solid var(--border-color);
+}
+
+.matrix-table th {
+    background: rgba(255, 255, 255, 0.02);
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.matrix-table td {
+    font-weight: 500;
+}
+
+/* 민감도 셀 분위 컬러 테마 */
+.cell-base {
+    background: rgba(14, 165, 233, 0.2) !important;
+    font-weight: 700 !important;
+    border: 2px solid var(--color-sky) !important;
+}
+
+.cell-positive {
+    background: rgba(16, 185, 129, 0.08);
+    color: var(--color-emerald);
+}
+
+.cell-negative {
+    background: rgba(239, 68, 68, 0.08);
+    color: var(--color-crimson);
+}
+
+.cell-neutral {
+    color: var(--text-primary);
+}
+
+/* 인사이트 코멘트 복스 */
+.insights-content {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.insight-item {
+    border-left: 3px solid #ccc;
+    padding: 8px 12px;
+    background: rgba(255, 255, 255, 0.01);
+    border-radius: 0 4px 4px 0;
+}
+
+.insight-item-title {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 600;
+    font-size: 0.75rem;
+    margin-bottom: 4px;
+}
+
+.insight-item-title i {
+    width: 14px;
+    height: 14px;
+}
+
+.insight-item p {
+    font-size: 0.72rem;
+    color: var(--text-secondary);
+}
+
+.insight-item.warning {
+    border-color: var(--color-crimson);
+    background: rgba(239, 68, 68, 0.03);
+}
+.insight-item.warning .insight-item-title { color: #f87171; }
+
+.insight-item.success {
+    border-color: var(--color-emerald);
+    background: rgba(16, 185, 129, 0.03);
+}
+.insight-item.success .insight-item-title { color: #34d399; }
+
+.insight-item.info {
+    border-color: var(--color-sky);
+    background: rgba(14, 165, 233, 0.03);
+}
+.insight-item.info .insight-item-title { color: #60a5fa; }
+
+/* 월별 상세 수지 테이블 구역 */
+.table-section {
+    margin-top: 16px;
+}
+
+.table-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.table-legend {
+    display: flex;
+    gap: 16px;
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.color-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.color-dot.in { background-color: var(--color-emerald); }
+.color-dot.out { background-color: var(--color-sky); }
+.color-dot.cc { background-color: var(--color-crimson); }
+
+.table-wrapper {
+    overflow-x: auto;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+}
+
+.cf-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.7rem;
+    text-align: right;
+}
+
+.cf-table th, 
+.cf-table td {
+    padding: 6px 10px;
+    border-bottom: 1px solid var(--border-color);
+    white-space: nowrap;
+}
+
+.cf-table th:first-child,
+.cf-table td:first-child {
+    text-align: left;
+    position: sticky;
+    left: 0;
+    background-color: #0f1626;
+    z-index: 10;
+    border-right: 1px solid var(--border-color);
+}
+
+.cf-table th {
+    background-color: rgba(255, 255, 255, 0.02);
+    color: var(--text-secondary);
+    font-weight: 600;
+}
+
+/* 아코디언 행 토글 스타일 */
+.category-row {
+    background-color: rgba(14, 165, 233, 0.03);
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+
+.category-row:hover {
+    background-color: rgba(14, 165, 233, 0.08);
+}
+
+.category-row td:first-child::before {
+    content: "▼ ";
+    font-size: 0.6rem;
+    color: var(--color-sky);
+    margin-right: 4px;
+    display: inline-block;
+    transition: transform 0.2s ease;
+}
+
+.category-row.collapsed td:first-child::before {
+    transform: rotate(-90deg);
+}
+
+/* 자식 행 접혔을 때 상태 */
+.child-row.collapsed {
+    display: none;
+}
+
+.child-row td:first-child {
+    padding-left: 20px;
+    color: var(--text-secondary);
+}
+
+/* 강조 폰트 컬러 매핑 */
+.text-green { color: #34d399 !important; }
+.text-red { color: #f87171 !important; }
+
+/* 요약 계산행 */
+.bold-row {
+    font-weight: 700;
+    background-color: rgba(255, 255, 255, 0.01);
+}
+
+.summary-row {
+    font-weight: 700;
+    background-color: rgba(14, 165, 233, 0.08) !important;
+    border-top: 1px solid var(--color-sky);
+    border-bottom: 2px double var(--color-sky);
+}
+
+.summary-row td {
+    color: #ffffff !important;
+}
+
+/* 가정 사항 요약 테이블 (기본 상태에서는 웹 화면에 정밀 테이블로 정렬) */
+.print-assumptions-section {
+    margin-bottom: 16px;
+    border: 1px dashed rgba(14, 165, 233, 0.2);
+}
+
+.print-assumptions-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-top: 10px;
+}
+
+.report-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.7rem;
+}
+
+.report-table th {
+    background: rgba(14, 165, 233, 0.08);
+    color: var(--color-sky);
+    text-align: left;
+    padding: 6px;
+    font-weight: 700;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.report-table td {
+    padding: 5px 6px;
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-secondary);
+}
+
+.report-table td:last-child {
+    text-align: right;
+    color: #ffffff;
+    font-weight: 500;
+}
+
+/* 상품명 인라인 인풋 필드 스타일 */
+.product-name-input {
+    background: transparent !important;
+    border: none !important;
+    border-bottom: 1px dashed rgba(255, 255, 255, 0.25) !important;
+    color: inherit !important;
+    font-size: 0.75rem !important;
+    font-weight: 700 !important;
+    padding: 2px 4px !important;
+    width: 130px !important;
+    outline: none !important;
+    transition: all 0.2s ease !important;
+    border-radius: 2px !important;
+}
+
+.product-name-input:focus {
+    border-bottom: 1px solid var(--color-sky) !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+    box-shadow: none !important;
+}
+
+/* ==========================================================================
+   PRINTER-FRIENDLY PRINT STYLES (A4 Landscape 가로 최적화)
+   ========================================================================== */
+@media print {
+    /* 가로 규격 강제 및 여백 최적화 */
+    @page {
+        size: A4 landscape;
+        margin: 8mm 6mm;
+    }
+    
+    /* 1. 배경을 화이트 모드로 완벽히 전환 */
+    :root {
+        --bg-main: #ffffff;
+        --bg-card: #ffffff;
+        --border-color: #cccccc;
+        --text-primary: #000000;
+        --text-secondary: #333333;
+        --text-muted: #666666;
+    }
+
+    body {
+        background-color: #ffffff !important;
+        color: #000000 !important;
+        font-size: 8pt;
+    }
+
+    /* 2. 조작용 사이드바 및 버튼들 완벽 차단 */
+    .sidebar-panel,
+    .header-actions,
+    #toggleAllRowsBtn,
+    .action-btn {
+        display: none !important;
+    }
+
+    /* 3. 대시보드 메인을 전체 너비로 확장 */
+    .app-container {
+        display: block !important;
+    }
+
+    .dashboard-main {
+        padding: 0 !important;
+        margin: 0 !important;
+        width: 100% !important;
+        background: none !important;
+        overflow: visible !important;
+    }
+
+    .main-header h2 {
+        color: #000000 !important;
+        font-size: 14pt !important;
+        text-align: center;
+        border-bottom: 2px solid #000000;
+        padding-bottom: 6px;
+    }
+
+    /* 4. 카드 및 판넬 투명화 & 연한 테두리 */
+    .card-panel,
+    .kpi-card {
+        background: #ffffff !important;
+        border: 1px solid #999999 !important;
+        box-shadow: none !important;
+        color: #000000 !important;
+        border-radius: 4px !important;
+        padding: 10px !important;
+    }
+
+    .kpi-card .kpi-value {
+        color: #000000 !important;
+        font-size: 16pt !important;
+    }
+    
+    .kpi-card.highlight-card {
+        background: #fdf2f2 !important; /* 엷은 경고색 유지 */
+        border: 1px solid #f8b4b4 !important;
+    }
+
+    /* 5. 가정 사항 요약 테이블 인쇄 최적화 */
+    .print-assumptions-section {
+        display: block !important;
+        border: 1px solid #999999 !important;
+        margin-bottom: 12px;
+        page-break-inside: avoid;
+    }
+
+    .report-table th {
+        background: #f1f5f9 !important;
+        color: #000000 !important;
+        border-bottom: 1px solid #999999 !important;
+    }
+
+    .report-table td {
+        border-bottom: 1px solid #e2e8f0 !important;
+        color: #333333 !important;
+    }
+
+    .report-table td:last-child {
+        color: #000000 !important;
+    }
+
+    /* 6. 차트 인쇄 시 높이 축소 (종이 낭비 방지) */
+    .charts-section {
+        grid-template-columns: 1.8fr 1.2fr !important;
+        margin-top: 12px;
+        page-break-inside: avoid;
+    }
+
+    .chart-wrapper {
+        height: 180px !important;
+    }
+
+    /* 7. 민감도 및 리스크 검토의견 인쇄 최적화 */
+    .analysis-section {
+        margin-top: 12px;
+        page-break-before: always; /* 2페이지로 격식 있게 분리 */
+    }
+
+    .matrix-table th {
+        background: #f1f5f9 !important;
+        color: #000000 !important;
+        border: 1px solid #999999 !important;
+    }
+
+    .matrix-table td {
+        border: 1px solid #999999 !important;
+    }
+
+    /* 민감도 모드 배경색 잉크 보존용 밝은 톤으로 치환 */
+    .cell-base {
+        background: #e0f2fe !important;
+        border: 2px solid #0284c7 !important;
+        color: #0369a1 !important;
+    }
+    .cell-positive {
+        background: #f0fdf4 !important;
+        color: #166534 !important;
+    }
+    .cell-negative {
+        background: #fef2f2 !important;
+        color: #991b1b !important;
+    }
+
+    .insight-item {
+        background: #fafafa !important;
+        border: 1px solid #cccccc !important;
+        border-left: 4px solid #666666 !important;
+    }
+    .insight-item.warning { border-left-color: #ef4444 !important; background: #fff5f5 !important; }
+    .insight-item.success { border-left-color: #10b981 !important; background: #f0fff4 !important; }
+    .insight-item.info { border-left-color: #0ea5e9 !important; background: #f0f9ff !important; }
+    .insight-item-title { color: #000000 !important; }
+    .insight-item p { color: #333333 !important; }
+
+    /* 8. 대형 월별 수지 테이블 인쇄 대폭 튜닝 */
+    .table-section {
+        margin-top: 12px;
+        page-break-before: always; /* 3페이지로 강제 배치 */
+    }
+
+    .cf-table {
+        font-size: 6pt !important; /* 초미세 폰트 적용하여 36개월 가로 한장 인쇄 */
+        width: 100% !important;
+    }
+
+    .cf-table th, 
+    .cf-table td {
+        padding: 3px 4px !important;
+        border: 1px solid #dddddd !important; /* 격자선 전원 인쇄 */
+    }
+
+    /* 첫 번째 열 고정 배경 흰색으로 강제 */
+    .cf-table th:first-child,
+    .cf-table td:first-child {
+        background-color: #ffffff !important;
+        color: #000000 !important;
+        border-right: 2px solid #000000 !important;
+    }
+
+    /* 아코디언 강제 해제 (인쇄물에서 소분류가 누락되면 타당성 리포트 실격) */
+    .child-row.collapsed {
+        display: table-row !important;
+    }
+
+    .category-row {
+        background-color: #f8fafc !important;
+    }
+
+    .category-row td:first-child::before {
+        content: "■ " !important;
+    }
+
+    .summary-row {
+        background-color: #f0f9ff !important;
+        border-top: 1.5px solid #0284c7 !important;
+        border-bottom: 2px double #0284c7 !important;
+    }
+
+    .summary-row td {
+        color: #000000 !important;
+        font-weight: bold;
+    }
+}
