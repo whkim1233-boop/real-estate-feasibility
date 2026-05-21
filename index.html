@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>부동산 개발 사업성 및 Cash Flow 시뮬레이터 (Full Scale)</title>
-    <!-- Noto Sans KR & Inter Google Fonts -->
+    <!-- Noto Sans KR & Inter & Outfit Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- Lucide Icons Local -->
     <script src="lib/lucide.min.js"></script>
     <!-- Chart.js Local -->
@@ -225,6 +225,10 @@
                             <label for="landAcquisitionTax">취득세 및 공과금 (Acquisition Tax & Charges, %)</label>
                             <input type="number" id="landAcquisitionTax" value="5.2" step="0.1">
                         </div>
+                    </div>
+                    <div class="input-group">
+                        <label for="landOtherRights">기타 권리(잔여지분) 매입비 (기타 토지비, 억원)</label>
+                        <input type="number" id="landOtherRights" value="0.0" step="0.1">
                     </div>
 
                     <div class="section-title">2. 직접공사비 (Direct Construction Costs)</div>

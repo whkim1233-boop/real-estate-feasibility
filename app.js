@@ -282,6 +282,7 @@ function runSimulation() {
             landEviction: getValue("landEviction", 0),
             landCommission: getValue("landCommission", 0),
             landAcquisitionTax: getValue("landAcquisitionTax", 0) / 100,
+            landOtherRights: getValue("landOtherRights", 0),
 
             // 직접공사비
             constructionCostPy: getValue("constructionCostPy", 0),
@@ -506,7 +507,7 @@ function calculateFullCF(inputs) {
         salesArea_off, price_off, start_off, rate_off,
         salesArea_rtl, price_rtl, start_rtl, rate_rtl,
         salesArea_clt, price_clt, start_clt, rate_clt,
-        landPricePyVal, landEviction, landCommission, landAcquisitionTax,
+        landPricePyVal, landEviction, landCommission, landAcquisitionTax, landOtherRights,
         constructionCostPy, demolitionCost, constructionContingency,
         designCostPy, supervisionCostPy, inflowCostPy, surveyCost, permissionCost, artInstallation,
         mhRent, mhBuild, mhOperation, guaranteeFee, loanGuaranteeFee, adCost, leaseAgencyFee,
@@ -535,7 +536,7 @@ function calculateFullCF(inputs) {
 
     const landPriceTotal = (landPricePyVal * landArea) / 10000;
     const landTax = landPriceTotal * landAcquisitionTax;
-    const totalLandCost = landPriceTotal + landEviction + landCommission + landTax;
+    const totalLandCost = landPriceTotal + landEviction + landCommission + landTax + landOtherRights;
 
     const constructionTotal = (constructionCostPy * totalSalesArea) / 10000;
     
@@ -606,6 +607,7 @@ function calculateFullCF(inputs) {
         let outLandEviction = 0;
         let outLandCommission = 0;
         let outLandTax = 0;
+        let outLandOtherRights = 0;
 
         let outConstDocub = 0;
         let outConstDemolition = 0;
@@ -667,6 +669,7 @@ function calculateFullCF(inputs) {
             outLandPure = landPriceTotal;
             outLandCommission = landCommission;
             outLandTax = landTax;
+            outLandOtherRights = landOtherRights;
         }
         if (t <= pfTiming) {
             outLandEviction = landEviction / pfTiming;
@@ -777,7 +780,7 @@ function calculateFullCF(inputs) {
         outCapitalCallInterest = nextMonthCapCallInterest;
         totalCapitalCallInterest += outCapitalCallInterest;
 
-        cashOut += outLandPure + outLandEviction + outLandCommission + outLandTax +
+        cashOut += outLandPure + outLandEviction + outLandCommission + outLandTax + outLandOtherRights +
                    outConstDocub + outConstDemolition + outConstContingency +
                    outDesign + outSupervision + outInflow + outSurvey + outPermission + outArt +
                    outMhRent + outMhBuild + outMhOperation + outGuaranteeFee + outLoanGuaranteeFee + outAdCost + outLeaseAgencyFee +
@@ -793,14 +796,31 @@ function calculateFullCF(inputs) {
         let capCallExecuted = 0;
         let capCallRepaid = 0;
 
+        let pfRepaidA = 0;
+        let pfRepaidB = 0;
+
         if (endingBalance < 0) {
             capCallExecuted = -endingBalance;
             cumCapitalCall += capCallExecuted;
             endingBalance = 0;
-        } else if (endingBalance > 0 && cumCapitalCall > 0) {
-            capCallRepaid = Math.min(endingBalance, cumCapitalCall);
-            cumCapitalCall -= capCallRepaid;
-            endingBalance -= capCallRepaid;
+        } else {
+            if (cumCapitalCall > 0) {
+                capCallRepaid = Math.min(endingBalance, cumCapitalCall);
+                cumCapitalCall -= capCallRepaid;
+                endingBalance -= capCallRepaid;
+            }
+            if (endingBalance > 0) {
+                if (currentPfB > 0) {
+                    pfRepaidB = Math.min(endingBalance, currentPfB);
+                    currentPfB -= pfRepaidB;
+                    endingBalance -= pfRepaidB;
+                }
+                if (currentPfA > 0) {
+                    pfRepaidA = Math.min(endingBalance, currentPfA);
+                    currentPfA -= pfRepaidA;
+                    endingBalance -= pfRepaidA;
+                }
+            }
         }
 
         nextMonthCapCallInterest = cumCapitalCall * (capCallInterest / 12);
@@ -818,7 +838,7 @@ function calculateFullCF(inputs) {
             inSalesRtl,
             inSalesClt,
             inSales: inSalesTotal,
-            outLandTotal: outLandPure + outLandEviction + outLandCommission + outLandTax,
+            outLandTotal: outLandPure + outLandEviction + outLandCommission + outLandTax + outLandOtherRights,
             outConstTotal: outConstDocub + outConstDemolition + outConstContingency,
             outIndirectTotal: outDesign + outSupervision + outInflow + outSurvey + outPermission + outArt,
             outSalesTotal: outMhRent + outMhBuild + outMhOperation + outGuaranteeFee + outLoanGuaranteeFee + outAdCost + outLeaseAgencyFee,
@@ -826,7 +846,7 @@ function calculateFullCF(inputs) {
             outTaxesTotal: outRegTaxes + outInfraCharge + outSchoolCharge + outLicenceTax + outMiscCharge + outHoldingTax + outCityPlanTax,
             outFinanceTotal: outBlFee + outBlInterest + outPfTrAInterest + outPfTrBInterest + outPfTrAFee + outPfTrBFee + outPfArrangeFee + outFiAdvisoryFee + outAbsCosts + outUndrawnFee + outFreeInterestHousing + outFreeInterestRetail + outCapitalCallInterest,
             
-            outLandPure, outLandEviction, outLandCommission, outLandTax,
+            outLandPure, outLandEviction, outLandCommission, outLandTax, outLandOtherRights,
             outConstDocub, outConstDemolition, outConstContingency,
             outDesign, outSupervision, outInflow, outSurvey, outPermission, outArt,
             outMhRent, outMhBuild, outMhOperation, outGuaranteeFee, outLoanGuaranteeFee, outAdCost, outLeaseAgencyFee,
@@ -837,7 +857,11 @@ function calculateFullCF(inputs) {
             endingBalance,
             capCallExecuted,
             capCallRepaid,
-            cumCapitalCall
+            cumCapitalCall,
+            pfRepaidA,
+            pfRepaidB,
+            endingPfA: currentPfA,
+            endingPfB: currentPfB
         });
     }
 
@@ -1193,6 +1217,7 @@ function renderCFTable(result) {
             isHeader: true,
             children: [
                 { label: "토지비 원금", key: "outLandPure" },
+                { label: "기타 권리 매입비", key: "outLandOtherRights" },
                 { label: "명도비용", key: "outLandEviction" },
                 { label: "토지매입수수료", key: "outLandCommission" },
                 { label: "취득세 및 기타비용", key: "outLandTax" }
@@ -1375,38 +1400,39 @@ function loadExampleData(type) {
         
         // 상품 정보
         setVal("name_apt", "Apartment");
-        setVal("salesArea_apt", 2594.8);
-        setVal("price_apt", 2200);
+        setVal("salesArea_apt", 3406.2);
+        setVal("price_apt", 4528.3);
         setVal("start_apt", 12);
         setVal("rate_apt", 100);
 
         setVal("name_off", "Officetel");
-        setVal("salesArea_off", 3571.5);
-        setVal("price_off", 1800);
+        setVal("salesArea_off", 8793.6);
+        setVal("price_off", 2169.8);
         setVal("start_off", 12);
         setVal("rate_off", 100);
 
         setVal("name_rtl", "Retail");
-        setVal("salesArea_rtl", 1131.4);
-        setVal("price_rtl", 3500);
+        setVal("salesArea_rtl", 2808.5);
+        setVal("price_rtl", 2462.5);
         setVal("start_rtl", 15);
         setVal("rate_rtl", 100);
 
         setVal("name_clt", "Fitness/기타");
-        setVal("salesArea_clt", 276.7);
-        setVal("price_clt", 1200);
+        setVal("salesArea_clt", 0.0);
+        setVal("price_clt", 0.0);
         setVal("start_clt", 18);
         setVal("rate_clt", 100);
 
         // 토지비 및 공사비
         setVal("landPricePy", 6130); 
         setVal("landEviction", 0.0);
-        setVal("landCommission", 30.5); 
-        setVal("landAcquisitionTax", 4.6);
+        setVal("landCommission", 30.6); 
+        setVal("landAcquisitionTax", 3.96);
+        setVal("landOtherRights", 250.4);
         
-        setVal("constructionCostPy", 600); 
+        setVal("constructionCostPy", 662.6); 
         setVal("demolitionCost", 55.6);
-        setVal("constructionContingency", 0.0);
+        setVal("constructionContingency", 49.7);
 
         // 간접공사비
         setVal("designCostPy", 35);
@@ -1465,8 +1491,8 @@ function loadExampleData(type) {
         setVal("pfTrAFee", 2.0); 
         setVal("pfTrBFee", 0.0);
         setVal("pfArrangeFee", 1.0);
-        setVal("fiAdvisoryFee", 26.3); 
-        setVal("absCosts", 52.6); 
+        setVal("fiAdvisoryFee", 3.0); 
+        setVal("absCosts", 19.2); 
         setVal("undrawnFee", 0.0);
         setVal("freeInterestHousing", 0.0);
         setVal("freeInterestRetail", 0.0);
@@ -1573,6 +1599,7 @@ function loadExampleData(type) {
         setVal("pfArrangeFee", 1.0);
         setVal("fiAdvisoryFee", 0.0);
         setVal("absCosts", 0.0);
+        setVal("landOtherRights", 0.0);
         setVal("undrawnFee", 0.0);
         setVal("freeInterestHousing", 0.0);
         setVal("freeInterestRetail", 0.0);
