@@ -233,8 +233,26 @@
 
                     <div class="section-title">2. 직접공사비 (Direct Construction Costs)</div>
                     <div class="input-group">
-                        <label for="constructionCostPy">평당 도급공사비 (Construction Cost per GFA Py, 만원)</label>
-                        <input type="number" id="constructionCostPy" value="600" step="10">
+                        <label for="constructionCostMode">공사비 산정 방식 (Calculation Mode)</label>
+                        <select id="constructionCostMode" class="form-select">
+                            <option value="salesArea" selected>분양면적 기준 (GFA Py Basis)</option>
+                            <option value="contractArea">계약면적 기준 (Contract Area Basis)</option>
+                            <option value="directInput">직접공사비 총액 직접입력 (Direct Total Input)</option>
+                        </select>
+                    </div>
+                    <div class="input-row" id="row-construction-rates">
+                        <div class="input-group" id="group-constructionCostPy">
+                            <label for="constructionCostPy">평당 도급공사비 (만원)</label>
+                            <input type="number" id="constructionCostPy" value="600" step="10">
+                        </div>
+                        <div class="input-group" id="group-contractArea" style="display: none;">
+                            <label for="contractArea">계약면적 (Contract Area, 평)</label>
+                            <input type="number" id="contractArea" value="17492.34" step="0.01">
+                        </div>
+                    </div>
+                    <div class="input-group" id="group-directConstCost" style="display: none;">
+                        <label for="directConstCost">직접도급공사비 총액 (Direct Construction Total, 억원)</label>
+                        <input type="number" id="directConstCost" value="1050.0" step="0.1">
                     </div>
                     <div class="input-row">
                         <div class="input-group">
@@ -527,6 +545,13 @@
                             <label for="discountRate">NPV 할인율 (연 %)</label>
                             <input type="number" id="discountRate" value="6.0" step="0.1">
                         </div>
+                    </div>
+                    <div class="input-group">
+                        <label for="irrMethod">IRR 연환산 방식 (IRR Annualization Method)</label>
+                        <select id="irrMethod" class="form-select">
+                            <option value="compounded" selected>월복리 연환산 (Compounded Monthly: (1+r)^12 - 1)</option>
+                            <option value="simple">단순 연단리 환산 (Simple Annualized: r * 12)</option>
+                        </select>
                     </div>
                 </div>
             </div>

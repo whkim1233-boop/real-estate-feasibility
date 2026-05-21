@@ -111,8 +111,15 @@ function initApp() {
         });
     }
 
+    // 공사비 산정 방식 토글 바인딩
+    const constCostMode = document.getElementById("constructionCostMode");
+    if (constCostMode) {
+        constCostMode.addEventListener("change", toggleConstructionFields);
+    }
+
     // 최초 갱신
     updateAreas();
+    toggleConstructionFields();
 
     // 분석 실행 버튼 바인딩
     const runBtn = document.getElementById("runSimBtn");
@@ -177,7 +184,7 @@ function getSCurveProgress(x) {
 }
 
 // Newton-Raphson 법을 활용한 IRR 계산기
-function calculateIRR(cashFlows) {
+function calculateIRR(cashFlows, irrMethod = 'compounded') {
     let hasPos = false;
     let hasNeg = false;
     cashFlows.forEach(cf => {
@@ -205,7 +212,12 @@ function calculateIRR(cashFlows) {
 
         let rNext = r - f / df;
         if (Math.abs(rNext - r) < tol) {
-            const annualIrr = Math.pow(1 + rNext, 12) - 1;
+            let annualIrr = 0;
+            if (irrMethod === 'simple') {
+                annualIrr = rNext * 12;
+            } else {
+                annualIrr = Math.pow(1 + rNext, 12) - 1;
+            }
             if (annualIrr < -0.99 || annualIrr > 15.0) return null;
             return annualIrr * 100;
         }
@@ -286,6 +298,9 @@ function runSimulation() {
 
             // 직접공사비
             constructionCostPy: getValue("constructionCostPy", 0),
+            constructionCostMode: getStrValue("constructionCostMode", "salesArea"),
+            contractArea: getValue("contractArea", 0),
+            directConstCost: getValue("directConstCost", 0),
             demolitionCost: getValue("demolitionCost", 0),
             constructionContingency: getValue("constructionContingency", 0),
 
@@ -354,7 +369,10 @@ function runSimulation() {
 
             // Capital Call 금리 및 할인율
             capCallInterest: getValue("capCallInterest", 0) / 100,
-            discountRate: getValue("discountRate", 6.0) / 100
+            discountRate: getValue("discountRate", 6.0) / 100,
+
+            // IRR 계산 방식
+            irrMethod: getStrValue("irrMethod", "compounded")
         };
 
         // 2. 비즈니스 로직 계산 패키지 실행
@@ -509,6 +527,7 @@ function calculateFullCF(inputs) {
         salesArea_clt, price_clt, start_clt, rate_clt,
         landPricePyVal, landEviction, landCommission, landAcquisitionTax, landOtherRights,
         constructionCostPy, demolitionCost, constructionContingency,
+        constructionCostMode, contractArea, directConstCost, irrMethod,
         designCostPy, supervisionCostPy, inflowCostPy, surveyCost, permissionCost, artInstallation,
         mhRent, mhBuild, mhOperation, guaranteeFee, loanGuaranteeFee, adCost, leaseAgencyFee,
         trustFee, generalAgencyFee, appraisalFee, lenderLegalFee, devLegalFee, pmPrePf, pmPostPf,
@@ -538,7 +557,15 @@ function calculateFullCF(inputs) {
     const landTax = landPriceTotal * landAcquisitionTax;
     const totalLandCost = landPriceTotal + landEviction + landCommission + landTax + landOtherRights;
 
-    const constructionTotal = (constructionCostPy * totalSalesArea) / 10000;
+    let constructionTotal = 0;
+    if (constructionCostMode === 'contractArea') {
+        constructionTotal = (constructionCostPy * contractArea) / 10000;
+    } else if (constructionCostMode === 'directInput') {
+        constructionTotal = directConstCost;
+    } else {
+        // 'salesArea' 기본값
+        constructionTotal = (constructionCostPy * totalSalesArea) / 10000;
+    }
     
     const designTotal = (designCostPy * totalSalesArea) / 10000;
     const supervisionTotal = (supervisionCostPy * totalSalesArea) / 10000;
@@ -900,7 +927,7 @@ function calculateFullCF(inputs) {
         projectCF.push({ t, val: inflow - outflow });
     }
     
-    const projectIRR = calculateIRR(projectCF);
+    const projectIRR = calculateIRR(projectCF, irrMethod);
     const projectNPV = calculateNPV(projectCF, discountRate);
 
     const equityCF = [];
@@ -917,7 +944,7 @@ function calculateFullCF(inputs) {
         equityCF.push({ t, val });
     }
 
-    const equityIRR = calculateIRR(equityCF);
+    const equityIRR = calculateIRR(equityCF, irrMethod);
     const equityNPV = calculateNPV(equityCF, discountRate);
 
     return {
@@ -1067,6 +1094,7 @@ function renderSensitivityTable(baseInputs, baseNetProfit) {
             scenarioInputs.price_clt = baseInputs.price_clt * (1 + vSales);
 
             scenarioInputs.constructionCostPy = baseInputs.constructionCostPy * (1 + vConst);
+            scenarioInputs.directConstCost = baseInputs.directConstCost * (1 + vConst);
 
             const scenarioResult = calculateFullCF(scenarioInputs);
             const profit = scenarioResult.netProfit;
@@ -1430,7 +1458,10 @@ function loadExampleData(type) {
         setVal("landAcquisitionTax", 3.96);
         setVal("landOtherRights", 250.4);
         
-        setVal("constructionCostPy", 662.6); 
+        setVal("constructionCostMode", "contractArea");
+        setVal("contractArea", 17492.34);
+        setVal("constructionCostPy", 600.26); 
+        setVal("directConstCost", 1050.0);
         setVal("demolitionCost", 55.6);
         setVal("constructionContingency", 49.7);
 
@@ -1499,6 +1530,7 @@ function loadExampleData(type) {
 
         setVal("capCallInterest", 8.0);
         setVal("discountRate", 6.0);
+        setVal("irrMethod", "compounded");
 
     } else if (type === "insadong") {
         // 2. 인사동 PFV 개발사업 - PDF 및 실무 수서 기준 매핑
@@ -1538,6 +1570,9 @@ function loadExampleData(type) {
         setVal("landCommission", 2.5);
         setVal("landAcquisitionTax", 5.2);
 
+        setVal("constructionCostMode", "salesArea");
+        setVal("contractArea", 0.0);
+        setVal("directConstCost", 0.0);
         setVal("constructionCostPy", 600);
         setVal("demolitionCost", 5.0);
         setVal("constructionContingency", 7.5);
@@ -1606,6 +1641,7 @@ function loadExampleData(type) {
 
         setVal("capCallInterest", 8.0);
         setVal("discountRate", 6.0);
+        setVal("irrMethod", "compounded");
     }
 
     // 변경된 모든 인풋들에 따라 면적 계산을 동기화하기 위한 이벤트 강제 트리거
@@ -1616,4 +1652,29 @@ function loadExampleData(type) {
 
     // 시뮬레이션 즉각 재실행
     runSimulation();
+}
+
+// 직접공사비 입력 필드 동적 노출 토글 함수
+function toggleConstructionFields() {
+    const modeEl = document.getElementById("constructionCostMode");
+    if (!modeEl) return;
+    const mode = modeEl.value;
+
+    const groupConstCostPy = document.getElementById("group-constructionCostPy");
+    const groupContractArea = document.getElementById("group-contractArea");
+    const groupDirectConstCost = document.getElementById("group-directConstCost");
+
+    if (mode === "salesArea") {
+        if (groupConstCostPy) groupConstCostPy.style.display = "block";
+        if (groupContractArea) groupContractArea.style.display = "none";
+        if (groupDirectConstCost) groupDirectConstCost.style.display = "none";
+    } else if (mode === "contractArea") {
+        if (groupConstCostPy) groupConstCostPy.style.display = "block";
+        if (groupContractArea) groupContractArea.style.display = "block";
+        if (groupDirectConstCost) groupDirectConstCost.style.display = "none";
+    } else if (mode === "directInput") {
+        if (groupConstCostPy) groupConstCostPy.style.display = "none";
+        if (groupContractArea) groupContractArea.style.display = "none";
+        if (groupDirectConstCost) groupDirectConstCost.style.display = "block";
+    }
 }
